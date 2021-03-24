@@ -7,10 +7,23 @@ lastname: string;
   }
   
   export interface DatabaseUserInterface {
-  name: string;
-lastname: string;
+    name: string;
+    lastname: string;
     username: string;
     password: string;
     isAdmin: boolean;
-    _id: string;
+    googleId?: string;
+    twitterId?: string;
+    githubId?: string;
+    __v: number;
+    _id: string; 
   }
+
+//   export interface IMongoDBUser {
+//     googleId?: string;
+//     twitterId?: string;
+//     githubId?: string;
+//     username: string;
+//     __v: number;
+//     _id: string;
+// }

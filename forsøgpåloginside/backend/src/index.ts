@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { PromiseProvider } from 'mongoose';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import passport from 'passport';
@@ -8,13 +8,15 @@ import session from 'express-session';
 import bcrypt from 'bcryptjs';
 import User from './User'
 import dotenv from 'dotenv';
-import { UserInterface, DatabaseUserInterface } from './Interfaces/UserInterface';
+import { UserInterface, DatabaseUserInterface} from './Interfaces/UserInterface';
+import { fail } from 'node:assert';
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+
 
 const LocalStrategy = passportLocal.Strategy
 
 dotenv.config();
-//mongodb+srv://chri85eu:Chri290u@db1.0y7tr.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
-//mongodb+srv://chri85eu:Chri290u@db1.0y7tr.mongodb.net/db1?retryWrites=true&w=majority
+
 mongoose.connect(`mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@db1.0y7tr.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`,{
     useCreateIndex: true,
     useNewUrlParser: true,
@@ -24,10 +26,12 @@ mongoose.connect(`mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONG
     console.log("Connected To Mongo")
   });
 
+//normal login
   // Middleware
 const app = express();
 app.use(express.json());
 app.use(cors({ origin: "http://localhost:3000", credentials: true }))
+app.set("trust proxy", 1);
 app.use(
   session({
     secret: "secretcode",
@@ -35,6 +39,17 @@ app.use(
     saveUninitialized: true,
   })
 );
+app.use(
+  session({
+    secret: "secretcode",
+    resave: true,
+    saveUninitialized: true,
+    cookie: {
+      sameSite: "none",
+      secure: true,
+      maxAge: 1000 * 60 * 60 * 24 * 7 // One Week
+    }
+  }))
 app.use(cookieParser());
 app.use(passport.initialize());
 app.use(passport.session());
@@ -57,26 +72,61 @@ passport.use(new LocalStrategy((username: string, password: string, done) => {
 })
 );
 
-passport.serializeUser((user: DatabaseUserInterface, cb) => {
-  cb(null, user._id);
+//normal login gammelt virker kun med normal login
+
+// passport.serializeUser((user: DatabaseUserInterface, cb) => {
+//   cb(null, user._id);
+// });
+
+// passport.deserializeUser((id: string, cb) => {
+//   User.findOne({ _id: id }, (err: any, user: DatabaseUserInterface) => {
+//     const userInformation : UserInterface = {
+//       name: user.name,
+//       lastname: user.lastname,
+//       username: user.username,
+//       isAdmin: user.isAdmin,
+//       id: user._id
+//     };
+//     cb(err, userInformation);
+//   });
+// });
+//normal login
+
+//andet login
+passport.serializeUser((user: DatabaseUserInterface, done: any) => {
+  return done(null, user);
+});
+passport.deserializeUser((user: any, done: any) => {
+  return done(null, user);
 });
 
-passport.deserializeUser((id: string, cb) => {
-  User.findOne({ _id: id }, (err: any, user: DatabaseUserInterface) => {
-    const userInformation : UserInterface = {
-      name: user.name,
-      lastname: user.lastname,
-      username: user.username,
-      isAdmin: user.isAdmin,
-      id: user._id
-    };
-    cb(err, userInformation);
-  });
-});
 
+//google
+passport.use(new GoogleStrategy({
+  clientID: `${process.env.GOOGLE_CLIENT_ID}`,
+  clientSecret:`${process.env.GOOGLE_CLIENT_SECRET}`,
+  callbackURL: "http://localhost:4000/auth/google/callback"
+},
+  function (accestoken: any, refreshToken: any, profile: any, cb: any) {
+    User.findOne({googleid: profile.id}, async(err: Error, doc: DatabaseUserInterface)=>{
+     if(err){
+       return cb(err,null);
+     }
+      if(!doc){
+        const newUser = new User({
+          googleId: profile.id,
+          username: profile.name.givenName
+        });
+        await newUser.save();
+      }
+    });
+    console.log(profile);
+    cb(null, profile);
 
+  }));
+//google login
 
-
+//normal login
 //routes
 app.post('/register', async(req, res)=> {
     //username, password
@@ -124,9 +174,21 @@ if (!username || !password || typeof username !== "string" || typeof password !=
     res.send("Sorry, you arent logged in.")
   }
   }
+  //normal login
 
 
+//google login
+//get
+  app.get('/auth/google', passport.authenticate('google', { scope: ['profile'] }));
+//callback
+  app.get('/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: '/login' }),
+    function (req, res) {
+      res.redirect('http://localhost:3000');
+    });
+//google login
 
+//normal login
   app.post('/login', passport.authenticate("local"), (req, res) =>{
     res.send("succes")
   });
@@ -167,7 +229,10 @@ if (!username || !password || typeof username !== "string" || typeof password !=
     res.send(filteredUsers);
     })
   })
+  //andet login
 
+  //andet login
   app.listen(4000, () => {
       console.log("Server started");
   })
+//normal login

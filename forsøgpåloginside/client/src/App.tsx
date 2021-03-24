@@ -8,13 +8,13 @@ import Profile from './Pages/Profile';
 import "./Main.css";
 import { myContext } from './Pages/Context';
 import Register from './Pages/Register';
-import AppBar from '@material-ui/core/AppBar';
+
 
 
 
 function App() {
   const ctx = useContext(myContext);
-  
+  console.log(ctx);
   return (
     <div>
       
@@ -29,7 +29,9 @@ function App() {
             ctx ? (
               <>
                 {ctx.isAdmin ? <Route path='/admin' component={AdminPage}></Route> : null}
+               
                 <Route path='/profile' component={Profile}></Route>  
+                
               </>
             ) : (
               <>

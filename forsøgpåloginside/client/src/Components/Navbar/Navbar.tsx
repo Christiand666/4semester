@@ -1,4 +1,4 @@
-import React, {useContext,  useState } from 'react'
+import React, {useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { myContext } from '../../Pages/Context'
 import Axios, { AxiosResponse } from 'axios';
@@ -7,7 +7,6 @@ import AppBar from "@material-ui/core/AppBar";
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import { spacing } from '@material-ui/system';
 import IconButton from '@material-ui/core/IconButton'
 import MenuIcon from '@material-ui/icons/Menu';
 import InputBase from '@material-ui/core/InputBase';
@@ -15,7 +14,6 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import AccountCircle from '@material-ui/icons/AccountCircle';
-import MoreIcon from '@material-ui/icons/MoreVert';
 import clsx from 'clsx';
 import Drawer from '@material-ui/core/Drawer';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -24,10 +22,7 @@ import Divider from '@material-ui/core/Divider';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
 
 export default function NavBar() {
   const ctx = useContext(myContext);
@@ -205,9 +200,7 @@ const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     handleMobileMenuClose();
   };
 
-  const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setMobileMoreAnchorEl(event.currentTarget);
-  };
+  
 
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
@@ -373,7 +366,5 @@ const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     
   )
 }
-  function props(props: any) {
-    throw new Error('Function not implemented.');
-  }
+  
 
