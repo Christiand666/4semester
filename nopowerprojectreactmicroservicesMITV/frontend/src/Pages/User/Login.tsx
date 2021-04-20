@@ -30,7 +30,7 @@ export default function Login() {
   const [cookies, setCookie, removeCookie] = useCookies(['cookie-name']);
   const history = useHistory();
   const login = () => {
-    axios.post("http://server.topper144p.com:3000/login", {
+    axios.post("http://localhost:3000/login", {
       email: email,
       password: password
     }).then((res :AxiosResponse) =>{
