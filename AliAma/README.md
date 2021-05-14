@@ -1,4 +1,4 @@
-# fullstackmevn
+# AliAma
 
 ## Project setup
 ```
